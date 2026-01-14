@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Futures for Children - Resource Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f9fafb;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: #9398DC;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        
+        .credit {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-style: italic;
+            text-align: right;
+            margin-top: 1rem;
+        }
+        
+        .credit a {
+            color: #9398DC;
+            text-decoration: none;
+        }
+        
+        .credit a:hover {
+            text-decoration: underline;
+        }
+        
+        .search-panel {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 4px solid #9E9ADE;
+        }
+        
+        .query-display {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .query-highlight {
+            font-weight: 600;
+            color: #9398DC;
+        }
+        
+        .legend-note {
+            background: white;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .legend-toggle {
+            cursor: pointer;
+            display: inline-block;
+            background: #FCD34D;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            user-select: none;
+            border: none;
+            color: #374151;
+            font-weight: 600;
+        }
+        
+        .legend-toggle:hover {
+            background: #FBBF24;
+        }
+        
+        .legend-content {
+            margin-top: 0.75rem;
+            display: block;
+            color: #374151;
+        }
+        
+        .legend-content.collapsed {
+            display: none;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #9398DC;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-box {
+            border: 1px solid #D4D6F2;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-content: flex-start;
+        }
+        
+        .filter-option {
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #D4D6F2;
+            color: #374151;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+        
+        .filter-option:hover {
+            background: #9E9ADE;
+            color: white;
+        }
+        
+        .filter-option.selected {
+            background: #9398DC;
+            color: white;
+        }
+        
+        .filter-option.has-overlap {
+            background: #D4D6F2;
+            color: #374151;
+            border: 1.5px solid #9398DC;
+            box-shadow: 0 0 0 0.5px #9398DC;
+        }
+        
+        .filter-option.has-overlap:hover {
+            background: #9E9ADE;
+            color: white;
+            border: 1.5px solid #9398DC;
+        }
+        
+        .selected-tags {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #9398DC;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #9E9ADE;
+        }
+        
+        .btn-secondary {
+            background: #D4D6F2;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #9E9ADE;
+            color: white;
+        }
+        
+        .results-panel {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .results-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #9398DC;
+            margin-bottom: 1rem;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .spinner {
+            border: 3px solid #D4D6F2;
+            border-top: 3px solid #9398DC;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-item {
+            border: 1px solid #D4D6F2;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+            border-left: 4px solid #9E9ADE;
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 1.5rem;
+        }
+        
+        .citation {
+            color: #111827;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .dfc-note {
+            background: #D4D6F2;
+            border-left: 4px solid #9398DC;
+            padding: 0.75rem;
+            margin: 0.75rem 0;
+        }
+        
+        .dfc-note-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dfc-citation {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-style: italic;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .dfc-disclaimer {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: #92400E;
+            line-height: 1.5;
+            border-radius: 0.375rem;
+        }
+        
+        .dfc-note-text {
+            font-size: 0.875rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+        
+        .dfc-note-text strong, .dfc-note-text b {
+            font-weight: 700;
+            color: #374151;
+        }
+        
+        .dfc-note-text em, .dfc-note-text i {
+            font-style: italic;
+            color: #374151;
+        }
+        
+        .dfc-note-text u {
+            text-decoration: underline;
+            color: #374151;
+        }
+        
+        .dfc-note-text blockquote {
+            border-left: 3px solid #9398DC;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            font-style: italic;
+            color: #6b7280;
+            background: transparent;
+        }
+        
+        .dfc-note-text ul, .dfc-note-text ol {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .dfc-note-text li {
+            margin-bottom: 0.25rem;
+            color: #374151;
+        }
+        
+        .dfc-note-text p {
+            margin-bottom: 0.5rem;
+            color: #374151;
+            background: transparent;
+        }
+        
+        .dfc-note-text a {
+            color: #9398DC;
+            text-decoration: underline;
+            background: transparent;
+        }
+        
+        .dfc-note-text span {
+            background: transparent;
+            color: inherit;
+        }
+        
+        .dfc-note-text div {
+            background: transparent;
+            color: inherit;
+        }
+        
+        .abstract {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        
+        .resource-link {
+            color: #9398DC;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+            color: #9E9ADE;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .tag {
+            background: #D4D6F2;
+            color: #374151;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .empty-state {
+            color: #6b7280;
+            font-style: italic;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .loading-notes {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #9398DC;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .loading-notes .spinner {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Digital Futures for Children centre</h1>
+        <p class="subtitle">Global Research Database Search Tool | <a href="https://www.digital-futures-for-children.net/our-work/research-database" target="_blank" rel="noopener noreferrer" style="color: #9398DC; text-decoration: none;">Learn more</a></p>
+        <p class="subtitle" style="margin-top: -1rem; margin-bottom: 2rem;">
+            Database hosted on <a href="https://www.zotero.org/groups/5501205/digitalfuturesforchildren" target="_blank" rel="noopener noreferrer" style="color: #9398DC; text-decoration: none;">Zotero</a>
+        </p>
+        
+        <div class="search-panel">
+            <div class="query-display">
+                I want to find resources about 
+                <span class="query-highlight" id="topicDisplay">[all topics]</span>
+                in 
+                <span class="query-highlight" id="countryDisplay">[all countries]</span>
+                using 
+                <span class="query-highlight" id="methodologyDisplay">[all methodologies]</span>.
+            </div>
+
+            <div class="legend-note">
+                <span class="legend-toggle" onclick="toggleInstructions()">
+                    💡 How to use <span id="instructions-arrow">▼</span>
+                </span>
+                <div class="legend-content collapsed" id="instructions-content">
+                    <div style="margin-bottom: 0.5rem;">Find resources on multiple topics, countries and methodologies by clicking on tags in the search box.</div>
+                    <div style="margin-bottom: 0.5rem;">Your current selected tags look like this: <span style="background: #9398DC; color: white; padding: 0.35rem 0.6rem; border-radius: 0.375rem; font-size: 0.875rem; display: inline-block; margin-left: 0.25rem;">example selected tag</span></div>
+                    <div>Tags with a <span style="background: #D4D6F2; color: #374151; padding: 0.2rem 0.4rem; border-radius: 0.25rem; border: 1.5px solid #9398DC; box-shadow: 0 0 0 0.5px #9398DC;">purple border</span> have resources that overlap with your current selections and appear first in the list.</div>
+                </div>
+            </div>
+            
+            <div class="filters-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="filter-group">
+                    <label>Topics</label>
+                    <div class="filter-box" id="topicsFilter">
+                        <div class="loading" style="padding: 1rem;">
+                            <div class="spinner" style="width: 20px; height: 20px; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="selected-tags" id="topicsSelected"></div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Countries</label>
+                    <div class="filter-box" id="countriesFilter">
+                        <div class="loading" style="padding: 1rem;">
+                            <div class="spinner" style="width: 20px; height: 20px; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="selected-tags" id="countriesSelected"></div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Methodologies</label>
+                    <div class="filter-box" id="methodologiesFilter">
+                        <div class="loading" style="padding: 1rem;">
+                            <div class="spinner" style="width: 20px; height: 20px; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="selected-tags" id="methodologiesSelected"></div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="exportResults()" id="exportBtn" style="display: none;">
+                    <span>📄</span> Export Results
+                </button>
+                <button class="btn-secondary" onclick="clearAll()">
+                    <span>✕</span> Clear All Filters
+                </button>
+            </div>
+            
+            <p class="credit">Tool created by <a href="https://www.gazalatwork.com" target="_blank" rel="noopener noreferrer">Gazal Shekhawat</a> for the <a href="https://www.digital-futures-for-children.net/home" target="_blank" rel="noopener noreferrer">DFC</a></p>
+        </div>
+        
+        <div class="results-panel">
+            <h2 class="results-header">Results (<span id="resultCount">0</span> items)</h2>
+            <div id="loadingNotesIndicator" class="loading-notes" style="display: none;">
+                <div class="spinner"></div>
+                <span>Loading DFC notes...</span>
+            </div>
+            <div id="resultsContainer">
+                <p class="empty-state">Loading library data...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var GROUP_ID = '5501205';
+        var API_BASE = 'https://api.zotero.org/groups/' + GROUP_ID;
+        
+        var allItems = [];
+        var selectedTopics = [];
+        var selectedCountries = [];
+        var selectedMethodologies = [];
+        var itemNotes = {};
+        
+        function toggleInstructions() {
+            var content = document.getElementById('instructions-content');
+            var arrow = document.getElementById('instructions-arrow');
+            content.classList.toggle('collapsed');
+            arrow.textContent = content.classList.contains('collapsed') ? '▼' : '▲';
+        }
+        
+        function fetchZoteroData() {
+            fetch(API_BASE + '/items/top?limit=1&format=json')
+                .then(function(response) {
+                    var totalResults = response.headers.get('Total-Results');
+                    console.log('Total items:', totalResults);
+                    
+                    var limit = 100;
+                    var totalBatches = Math.ceil(totalResults / limit);
+                    var promises = [];
+                    
+                    for (var i = 0; i < totalBatches; i++) {
+                        var start = i * limit;
+                        var url = API_BASE + '/items/top?limit=' + limit + '&start=' + start + '&format=json';
+                        promises.push(fetch(url).then(function(r) { return r.json(); }));
+                    }
+                    
+                    return Promise.all(promises);
+                })
+                .then(function(batches) {
+                    var items = [];
+                    batches.forEach(function(batch) {
+                        items = items.concat(batch);
+                    });
+                    
+                    allItems = items.filter(function(item) {
+                        return item.data && item.data.title && item.data.title.trim() !== '';
+                    });
+                    
+                    console.log('Loaded', allItems.length, 'valid items');
+                    processTagsAndRender();
+                    handleSearch();
+                })
+                .catch(function(err) {
+                    console.error('Error:', err);
+                    document.getElementById('resultsContainer').innerHTML = '<div class="empty-state" style="color: #dc2626;">Error: ' + err.message + '</div>';
+                    document.getElementById('topicsFilter').innerHTML = '<p style="padding: 0.5rem; font-size: 0.875rem; color: #6b7280;">Error loading tags</p>';
+                    document.getElementById('countriesFilter').innerHTML = '<p style="padding: 0.5rem; font-size: 0.875rem; color: #6b7280;">Error loading tags</p>';
+                    document.getElementById('methodologiesFilter').innerHTML = '<p style="padding: 0.5rem; font-size: 0.875rem; color: #6b7280;">Error loading tags</p>';
+                });
+        }
+        
+        function processTagsAndRender() {
+            var topics = new Set();
+            var countries = new Set();
+            var methodologies = new Set();
+            
+            allItems.forEach(function(item) {
+                if (item.data && item.data.tags && item.data.tags.length > 0) {
+                    item.data.tags.forEach(function(tagObj) {
+                        var tag = tagObj.tag;
+                        var lowerTag = tag.toLowerCase();
+                        
+                        if (lowerTag.indexOf('topic') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) topics.add(value);
+                        } else if (lowerTag.indexOf('country') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) countries.add(value);
+                        } else if (lowerTag.indexOf('methodolog') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) methodologies.add(value);
+                        }
+                    });
+                }
+            });
+            
+            renderFilterOptions('topicsFilter', Array.from(topics).sort(), selectedTopics, 'topic');
+            renderFilterOptions('countriesFilter', Array.from(countries).sort(), selectedCountries, 'country');
+            renderFilterOptions('methodologiesFilter', Array.from(methodologies).sort(), selectedMethodologies, 'methodology');
+        }
+        
+        function getOverlappingTags(category) {
+            var filtered = allItems.filter(function(item) {
+                if (!item.data || !item.data.tags) return false;
+                
+                var itemTags = item.data.tags.map(function(t) { return t.tag.toLowerCase(); });
+                
+                var matchesTopic = selectedTopics.length === 0 || 
+                    selectedTopics.some(function(topic) { 
+                        return itemTags.some(function(tag) {
+                            return tag.indexOf('topic') === 0 && tag.indexOf(topic.toLowerCase()) > -1;
+                        });
+                    });
+                
+                var matchesCountry = selectedCountries.length === 0 || 
+                    selectedCountries.some(function(country) {
+                        return itemTags.some(function(tag) {
+                            return tag.indexOf('country') === 0 && tag.indexOf(country.toLowerCase()) > -1;
+                        });
+                    });
+                
+                var matchesMethodology = selectedMethodologies.length === 0 || 
+                    selectedMethodologies.some(function(method) {
+                        return itemTags.some(function(tag) {
+                            return tag.indexOf('methodolog') === 0 && tag.indexOf(method.toLowerCase()) > -1;
+                        });
+                    });
+                
+                return matchesTopic && matchesCountry && matchesMethodology;
+            });
+            
+            var overlappingTags = new Set();
+            filtered.forEach(function(item) {
+                if (item.data && item.data.tags) {
+                    item.data.tags.forEach(function(tagObj) {
+                        var tag = tagObj.tag;
+                        var lowerTag = tag.toLowerCase();
+                        
+                        if (category === 'topic' && lowerTag.indexOf('topic') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) overlappingTags.add(value);
+                        } else if (category === 'country' && lowerTag.indexOf('country') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) overlappingTags.add(value);
+                        } else if (category === 'methodology' && lowerTag.indexOf('methodolog') === 0) {
+                            var value = tag.substring(tag.indexOf(':') + 1).trim();
+                            if (value) overlappingTags.add(value);
+                        }
+                    });
+                }
+            });
+            
+            return overlappingTags;
+        }
+        
+        function renderFilterOptions(containerId, options, selectedArray, category) {
+            var container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (options.length === 0) {
+                container.innerHTML = '<p style="padding: 0.5rem; font-size: 0.875rem; color: #6b7280;">No tags found</p>';
+                return;
+            }
+            
+            var overlappingTags = getOverlappingTags(category);
+            var overlappingOptions = [];
+            var nonOverlappingOptions = [];
+            var selectedOptions = [];
+            
+            options.forEach(function(option) {
+                if (selectedArray.indexOf(option) > -1) {
+                    selectedOptions.push(option);
+                } else if (overlappingTags.has(option) && (selectedTopics.length > 0 || selectedCountries.length > 0 || selectedMethodologies.length > 0)) {
+                    overlappingOptions.push(option);
+                } else {
+                    nonOverlappingOptions.push(option);
+                }
+            });
+            
+            var orderedOptions = selectedOptions.concat(overlappingOptions).concat(nonOverlappingOptions);
+            
+            orderedOptions.forEach(function(option) {
+                var div = document.createElement('div');
+                div.className = 'filter-option';
+                div.textContent = option;
+                div.onclick = function() { toggleSelection(option, selectedArray, category); };
+                
+                if (selectedArray.indexOf(option) > -1) {
+                    div.classList.add('selected');
+                } else if (overlappingTags.has(option) && (selectedTopics.length > 0 || selectedCountries.length > 0 || selectedMethodologies.length > 0)) {
+                    div.classList.add('has-overlap');
+                }
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function toggleSelection(value, array, category) {
+            var index = array.indexOf(value);
+            if (index > -1) {
+                array.splice(index, 1);
+            } else {
+                array.push(value);
+            }
+            
+            processTagsAndRender();
+            updateQueryDisplay();
+            handleSearch();
+        }
+        
+        function updateQueryDisplay() {
+            document.getElementById('topicDisplay').textContent = 
+                selectedTopics.length > 0 ? selectedTopics.join(', ') : '[all topics]';
+            document.getElementById('countryDisplay').textContent = 
+                selectedCountries.length > 0 ? selectedCountries.join(', ') : '[all countries]';
+            document.getElementById('methodologyDisplay').textContent = 
+                selectedMethodologies.length > 0 ? selectedMethodologies.join(', ') : '[all methodologies]';
+            
+            document.getElementById('topicsSelected').textContent = 
+                selectedTopics.length > 0 ? 'Selected: ' + selectedTopics.join(', ') : '';
+            document.getElementById('countriesSelected').textContent = 
+                selectedCountries.length > 0 ? 'Selected: ' + selectedCountries.join(', ') : '';
+            document.getElementById('methodologiesSelected').textContent = 
+                selectedMethodologies.length > 0 ? 'Selected: ' + selectedMethodologies.join(', ') : '';
+        }
+        
+        function getFirstAuthor(item) {
+            if (!item.data || !item.data.creators || item.data.creators.length === 0) {
+                return 'zzz';
+            }
+            var author = item.data.creators[0];
+            if (author.name) {
+                return author.name;
+            } else if (author.lastName) {
+                return author.lastName;
+            } else {
+                return 'zzz';
+            }
+        }
+        
+        function getTitle(item) {
+            if (!item.data || !item.data.title) {
+                return 'zzz';
+            }
+            return item.data.title.toLowerCase();
+        }
+        
+        function handleSearch() {
+            if (selectedTopics.length === 0 && selectedCountries.length === 0 && selectedMethodologies.length === 0) {
+                var sortedItems = allItems.slice().sort(function(a, b) {
+                    var titleA = getTitle(a);
+                    var titleB = getTitle(b);
+                    return titleA.localeCompare(titleB);
+                });
+                displayResults(sortedItems);
+                fetchNotesForItems(sortedItems);
+                return;
+            }
+            
+            var itemsWithScores = [];
+            
+            allItems.forEach(function(item) {
+                if (!item.data || !item.data.tags) return;
+                
+                var itemTags = item.data.tags.map(function(t) { return t.tag.toLowerCase(); });
+                var matchCount = 0;
+                var topicMatches = 0;
+                var countryMatches = 0;
+                var methodologyMatches = 0;
+                
+                if (selectedTopics.length > 0) {
+                    selectedTopics.forEach(function(topic) {
+                        var hasMatch = itemTags.some(function(tag) {
+                            return tag.indexOf('topic') === 0 && tag.indexOf(topic.toLowerCase()) > -1;
+                        });
+                        if (hasMatch) {
+                            topicMatches++;
+                            matchCount++;
+                        }
+                    });
+                }
+                
+                if (selectedCountries.length > 0) {
+                    selectedCountries.forEach(function(country) {
+                        var hasMatch = itemTags.some(function(tag) {
+                            return tag.indexOf('country') === 0 && tag.indexOf(country.toLowerCase()) > -1;
+                        });
+                        if (hasMatch) {
+                            countryMatches++;
+                            matchCount++;
+                        }
+                    });
+                }
+                
+                if (selectedMethodologies.length > 0) {
+                    selectedMethodologies.forEach(function(method) {
+                        var hasMatch = itemTags.some(function(tag) {
+                            return tag.indexOf('methodolog') === 0 && tag.indexOf(method.toLowerCase()) > -1;
+                        });
+                        if (hasMatch) {
+                            methodologyMatches++;
+                            matchCount++;
+                        }
+                    });
+                }
+                
+                if (matchCount > 0) {
+                    var categoriesMatched = 0;
+                    if (topicMatches > 0) categoriesMatched++;
+                    if (countryMatches > 0) categoriesMatched++;
+                    if (methodologyMatches > 0) categoriesMatched++;
+                    
+                    var score = (categoriesMatched * 1000) + matchCount;
+                    
+                    itemsWithScores.push({
+                        item: item,
+                        score: score,
+                        title: getTitle(item)
+                    });
+                }
+            });
+            
+            itemsWithScores.sort(function(a, b) {
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+                return a.title.localeCompare(b.title);
+            });
+            
+            var sortedItems = itemsWithScores.map(function(obj) {
+                return obj.item;
+            });
+            
+            displayResults(sortedItems);
+            fetchNotesForItems(sortedItems);
+        }
+        
+        function fetchNotesForItems(items) {
+            var indicator = document.getElementById('loadingNotesIndicator');
+            if (indicator) indicator.style.display = 'flex';
+            itemNotes = {};
+            
+            var fetchedCount = 0;
+            
+            if (items.length === 0) {
+                if (indicator) indicator.style.display = 'none';
+                return;
+            }
+            
+            items.forEach(function(item) {
+                fetch(API_BASE + '/items/' + item.key + '/children?format=json')
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        return [];
+                    })
+                    .then(function(children) {
+                        var noteItems = children.filter(function(child) { return child.data.itemType === 'note'; });
+                        
+                        var dfcNote = noteItems.find(function(note) {
+                            return note.data.note && note.data.note.toLowerCase().indexOf('dfc') > -1;
+                        }) || noteItems[0];
+                        
+                        if (dfcNote) {
+                            var noteHTML = dfcNote.data.note
+                                .replace(/&nbsp;/g, ' ')
+                                .trim();
+                            
+                            // Extract disclaimer
+                            var disclaimer = '';
+                            var disclaimerMatch = noteHTML.match(/\*\*due to the extensive length of the resource.*?engage with the full report\*\*/i);
+                            if (disclaimerMatch) {
+                                disclaimer = disclaimerMatch[0].replace(/\*\*/g, '').trim();
+                            }
+                            
+                            // Remove everything before "DFC summary"
+                            var summaryIndex = noteHTML.search(/DFC summary/i);
+                            if (summaryIndex > 0) {
+                                noteHTML = noteHTML.substring(summaryIndex);
+                            }
+                            
+                            // Add disclaimer back
+                            if (disclaimer) {
+                                noteHTML = '<div class="dfc-disclaimer">' + disclaimer + '</div>' + noteHTML;
+                            }
+                            
+                            // Remove brackets
+                            noteHTML = noteHTML.replace(/^\[\s*\]/gm, '');
+                            noteHTML = noteHTML.replace(/\[\s*\]/g, '');
+                            
+                            // Remove inline styles
+                            noteHTML = noteHTML.replace(/\s+style="[^"]*"/gi, '');
+                            
+                            // Fix truncated heading
+                            noteHTML = noteHTML.replace(/\bs about the methodology\b/gi, 'DFC notes about the methodology');
+                            
+                            // Remove ALL header/bold tags
+                            noteHTML = noteHTML.replace(/<\/?h[1-6][^>]*>/gi, '');
+                            noteHTML = noteHTML.replace(/<\/?strong>/gi, '');
+                            noteHTML = noteHTML.replace(/<\/?b>/gi, '');
+                            
+                            // Apply consistent heading styling
+                            noteHTML = noteHTML.replace(/(DFC summary|DFC key takeaways|DFC notes about the methodology)/gi, 
+                                '<div style="font-weight: 600; color: #374151; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.875rem;">$1</div>');
+                            
+                            // Cleanup
+                            noteHTML = noteHTML.replace(/<br\s*\/?>\s*<br\s*\/?>\s*<br\s*\/?>/g, '<br><br>');
+                            noteHTML = noteHTML.replace(/<p>\s*<\/p>/g, '');
+                            
+                            itemNotes[item.key] = noteHTML;
+                        }
+                        
+                        fetchedCount++;
+                        if (fetchedCount === items.length) {
+                            if (indicator) indicator.style.display = 'none';
+                            displayResults(items);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Error fetching notes for item ' + item.key + ':', err);
+                        fetchedCount++;
+                        if (fetchedCount === items.length) {
+                            if (indicator) indicator.style.display = 'none';
+                            displayResults(items);
+                        }
+                    });
+            });
+        }
+        
+        function displayResults(items) {
+            var container = document.getElementById('resultsContainer');
+            var exportBtn = document.getElementById('exportBtn');
+            document.getElementById('resultCount').textContent = items.length;
+            
+            if (items.length > 0) {
+                exportBtn.style.display = 'flex';
+            } else {
+                exportBtn.style.display = 'none';
+            }
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p class="empty-state">No items match your selected criteria.</p>';
+                return;
+            }
+            
+            container.innerHTML = items.map(function(item) {
+                var citation = formatCitation(item);
+                var note = itemNotes[item.key];
+                var abstract = item.data.abstractNote;
+                var url = item.data.url;
+                var tags = item.data.tags || [];
+                var title = item.data.title || 'Untitled';
+                
+                var firstAuthor = getFirstAuthor(item);
+                
+                var html = '<div class="result-item">';
+                html += '<p class="citation">' + escapeHtml(citation) + '</p>';
+                
+                if (note) {
+                    html += '<div class="dfc-note-label">DFC Note</div>';
+                    html += '<div class="dfc-citation">Please cite as: "Source: Digital Futures for Children centre notes on \'' + escapeHtml(title) + '\' (by ' + escapeHtml(firstAuthor) + ') from the DFC research database https://www.digital-futures-for-children.net/research-database"</div>';
+                    html += '<div class="dfc-note"><div class="dfc-note-text">' + note + '</div>';
+                    
+                    if (abstract) {
+                        html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #C4C6E2;">';
+                        html += '<p style="font-size: 0.875rem; color: #374151;"><strong>Abstract:</strong> ' + escapeHtml(abstract) + '</p>';
+                        html += '</div>';
+                    }
+                    html += '</div>'; // Close dfc-note
+                } else if (abstract) {
+                    html += '<p class="abstract"><strong>Abstract:</strong> ' + escapeHtml(abstract) + '</p>';
+                }
+                
+                html += '<div class="tags">';
+                tags.forEach(function(t) {
+                    html += '<span class="tag">' + escapeHtml(t.tag) + '</span>';
+                });
+                html += '</div>';
+                
+                if (url) {
+                    html += '<div style="margin-top: 0.75rem;">';
+                    html += '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="resource-link">View resource →</a>';
+                    html += '</div>';
+                }
+                
+                html += '</div>'; // Close result-item
+                
+                return html;
+            }).join('');
+        }
+        
+        function formatCitation(item) {
+            var data = item.data;
+            var creators = data.creators || [];
+            
+            var authors = creators
+                .filter(function(c) { return c.creatorType === 'author'; })
+                .map(function(c) { 
+                    if (c.name) {
+                        return c.name;
+                    } else if (c.lastName && c.firstName) {
+                        return c.lastName + ', ' + c.firstName;
+                    } else if (c.lastName) {
+                        return c.lastName;
+                    } else {
+                        return 'Unknown Author';
+                    }
+                })
+                .join(', ');
+            
+            if (!authors) {
+                authors = 'No author';
+            }
+            
+            var year = 'n.d.';
+            if (data.date) {
+                var yearMatch = data.date.match(/\b(19|20)\d{2}\b/);
+                if (yearMatch) {
+                    year = yearMatch[0];
+                } else {
+                    var parsedDate = new Date(data.date);
+                    if (!isNaN(parsedDate.getTime())) {
+                        year = parsedDate.getFullYear();
+                    }
+                }
+            }
+            
+            var title = data.title || 'Untitled';
+            
+            return authors + ' (' + year + '). ' + title;
+        }
+        
+        function formatAPACitation(item) {
+            var data = item.data;
+            var citation = '';
+            
+            var creators = data.creators || [];
+            var authors = creators.filter(function(c) { return c.creatorType === 'author'; });
+            
+            if (authors.length > 0) {
+                if (authors.length === 1) {
+                    if (authors[0].name) {
+                        citation += authors[0].name;
+                    } else {
+                        citation += authors[0].lastName + ', ' + (authors[0].firstName ? authors[0].firstName.charAt(0) + '.' : '');
+                    }
+                } else if (authors.length === 2) {
+                    if (authors[0].name) {
+                        citation += authors[0].name;
+                    } else {
+                        citation += authors[0].lastName + ', ' + (authors[0].firstName ? authors[0].firstName.charAt(0) + '.' : '');
+                    }
+                    citation += ', & ';
+                    if (authors[1].name) {
+                        citation += authors[1].name;
+                    } else {
+                        citation += authors[1].lastName + ', ' + (authors[1].firstName ? authors[1].firstName.charAt(0) + '.' : '');
+                    }
+                } else {
+                    for (var i = 0; i < Math.min(authors.length - 1, 19); i++) {
+                        if (authors[i].name) {
+                            citation += authors[i].name;
+                        } else {
+                            citation += authors[i].lastName + ', ' + (authors[i].firstName ? authors[i].firstName.charAt(0) + '.' : '');
+                        }
+                        citation += ', ';
+                    }
+                    if (authors.length > 20) {
+                        citation += '... ';
+                    } else {
+                        citation += '& ';
+                    }
+                    var lastAuthor = authors[authors.length - 1];
+                    if (lastAuthor.name) {
+                        citation += lastAuthor.name;
+                    } else {
+                        citation += lastAuthor.lastName + ', ' + (lastAuthor.firstName ? lastAuthor.firstName.charAt(0) + '.' : '');
+                    }
+                }
+            }
+            
+            var year = 'n.d.';
+            if (data.date) {
+                var yearMatch = data.date.match(/\b(19|20)\d{2}\b/);
+                if (yearMatch) {
+                    year = yearMatch[0];
+                } else {
+                    var parsedDate = new Date(data.date);
+                    if (!isNaN(parsedDate.getTime())) {
+                        year = parsedDate.getFullYear();
+                    }
+                }
+            }
+            
+            citation += ' (' + year + '). ';
+            
+            var title = data.title || 'Untitled';
+            citation += title;
+            if (!title.match(/[.!?]$/)) {
+                citation += '.';
+            }
+            
+            if (data.itemType === 'journalArticle' && data.publicationTitle) {
+                citation += ' ' + data.publicationTitle;
+                if (data.volume) {
+                    citation += ', ' + data.volume;
+                    if (data.issue) {
+                        citation += '(' + data.issue + ')';
+                    }
+                }
+                if (data.pages) {
+                    citation += ', ' + data.pages;
+                }
+                citation += '.';
+            } else if (data.itemType === 'book' && data.publisher) {
+                citation += ' ' + data.publisher + '.';
+            } else if (data.itemType === 'bookSection') {
+                if (data.bookTitle) {
+                    citation += ' In ' + data.bookTitle;
+                    if (data.pages) {
+                        citation += ' (pp. ' + data.pages + ')';
+                    }
+                    citation += '.';
+                }
+                if (data.publisher) {
+                    citation += ' ' + data.publisher + '.';
+                }
+            }
+            
+            if (data.DOI) {
+                citation += ' https://doi.org/' + data.DOI;
+            } else if (data.url) {
+                citation += ' ' + data.url;
+            }
+            
+            return citation;
+        }
+        
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+        
+        function clearAll() {
+            selectedTopics = [];
+            selectedCountries = [];
+            selectedMethodologies = [];
+            itemNotes = {};
+            
+            processTagsAndRender();
+            updateQueryDisplay();
+            handleSearch();
+        }
+        
+        function exportResults() {
+            var filtered = [];
+            if (selectedTopics.length === 0 && selectedCountries.length === 0 && selectedMethodologies.length === 0) {
+                filtered = allItems.slice();
+            } else {
+                filtered = allItems.filter(function(item) {
+                    if (!item.data || !item.data.tags) return false;
+                    
+                    var itemTags = item.data.tags.map(function(t) { return t.tag.toLowerCase(); });
+                    var matchCount = 0;
+                    
+                    if (selectedTopics.length > 0) {
+                        selectedTopics.forEach(function(topic) {
+                            if (itemTags.some(function(tag) {
+                                return tag.indexOf('topic') === 0 && tag.indexOf(topic.toLowerCase()) > -1;
+                            })) matchCount++;
+                        });
+                    }
+                    
+                    if (selectedCountries.length > 0) {
+                        selectedCountries.forEach(function(country) {
+                            if (itemTags.some(function(tag) {
+                                return tag.indexOf('country') === 0 && tag.indexOf(country.toLowerCase()) > -1;
+                            })) matchCount++;
+                        });
+                    }
+                    
+                    if (selectedMethodologies.length > 0) {
+                        selectedMethodologies.forEach(function(method) {
+                            if (itemTags.some(function(tag) {
+                                return tag.indexOf('methodolog') === 0 && tag.indexOf(method.toLowerCase()) > -1;
+                            })) matchCount++;
+                        });
+                    }
+                    
+                    return matchCount > 0;
+                });
+            }
+            
+            var text = 'DIGITAL FUTURES FOR CHILDREN - SEARCH RESULTS\n';
+            text += '==============================================\n\n';
+            text += 'Export Date: ' + new Date().toLocaleDateString() + '\n';
+            text += 'Total Results: ' + filtered.length + '\n\n';
+            
+            if (selectedTopics.length > 0) {
+                text += 'Topics: ' + selectedTopics.join(', ') + '\n';
+            }
+            if (selectedCountries.length > 0) {
+                text += 'Countries: ' + selectedCountries.join(', ') + '\n';
+            }
+            if (selectedMethodologies.length > 0) {
+                text += 'Methodologies: ' + selectedMethodologies.join(', ') + '\n';
+            }
+            
+            text += '\n==============================================\n\n';
+            
+            filtered.forEach(function(item, index) {
+                text += (index + 1) + '. ' + formatAPACitation(item) + '\n\n';
+                
+                var note = itemNotes[item.key];
+                if (note) {
+                    var title = item.data.title || 'Untitled';
+                    var firstAuthor = getFirstAuthor(item);
+                    
+                    text += '   DFC Note:\n';
+                    text += '   Please cite as: "Source: Digital Futures for Children centre notes on \'' + title + '\' (by ' + firstAuthor + ') from the DFC research database https://www.digital-futures-for-children.net/research-database"\n\n';
+                    
+                    var plainNote = note.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                    text += '   ' + plainNote.replace(/\n/g, '\n   ') + '\n\n';
+                }
+                
+                if (item.data.abstractNote) {
+                    text += '   Abstract:\n';
+                    text += '   ' + item.data.abstractNote.replace(/\n/g, '\n   ') + '\n\n';
+                }
+                
+                text += '---\n\n';
+            });
+            
+            var blob = new Blob([text], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'dfc-search-results-' + new Date().toISOString().split('T')[0] + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        fetchZoteroData();
+        updateQueryDisplay();
+    </script>
+</body>
+</html>
